@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chatter - Friends</title>
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.modal.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link rel="stylesheet" href="/css/jquery.modal.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".friend_button").click(function () {
+                var id = $("#friend").val();
+                var url = "/friends.html";
+                $.post("/rest/friendships/create",
+                        {
+                            friend_id: id
+                        })
+                        .fail(function (data) {
+                            $("#friends-post").find("p").text("Sorry! "+ data["responseText"]+ " The friendship was not able to be created, please try again!");
+                            $('#friends-post').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function () {
+                            $(location).attr('href', url);
+                        });
+            });
+
+            $(".remove_friend_button").click(function () {
+                var id = $("#remove_friend").val();
+                var url = "/friends.html";
+                $.post("/rest/friendships/destroy",
+                        {
+                            friend_id: id
+                        })
+                        .fail(function (data) {
+                            $("#friends-post").find("p").text("Sorry! "+ data["responseText"]+ " The friendship was not able to be removed, please try again!");
+                            $('#friends-post').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function () {
+                            $(location).attr('href', url);
+                        });
+            });
+
+            $(".logout").click(function(){
+                var url = "/";
+                $.post("/rest/users/logout")
+                        .fail(function() {
+                            alert( "Sorry, something went wrong. Try again." );
+                        })
+                        .done(function() {
+                            $(location).attr('href',url);
+                        });
+            });
+
+            $.getJSON('/rest/friendships/incoming', function(data) {
+                $.each(data, function(i, incoming) {
+                    $('.IncomingData').append('<tr> <td>'+ incoming + '</td></tr>');
+                });
+            });
+
+            $.getJSON('/rest/friendships/outgoing', function(data) {
+                $.each(data, function(i, incoming) {
+                    $('.OutgoingData').append('<tr> <td>'+ incoming + '</td></tr>');
+                });
+            });
+
+            $.getJSON('/rest/friends/list', function(data) {
+                $.each(data, function(i, incoming) {
+                    $('.FollowingData').append('<tr> <td>'+ incoming + '</td></tr>');
+                });
+            });
+
+            $.getJSON('/rest/followers/list', function(data) {
+                $.each(data, function(i, incoming) {
+                    $('.FollowersData').append('<tr> <td>'+ incoming + '</td></tr>');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="pure-menu pure-menu-open pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading">Chatter</a>
+
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/tweet.html">Tweet</a></li>
+            <li class="pure-menu-selected"><a href="/friends.html">Friends</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a class="logout">Logout</a></li>
+        </ul>
+    </div>
+
+
+    <div class="pure-g">
+        <div class="pure-u-1">
+            <h1 class="l-box">Friends</h1>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <form class="pure-form ">
+                <div class="pure-input-1">
+                    <label for="friend">Friend</label>
+                    <input class="pure-input-1" id="friend" type="text" placeholder="Friend ID">
+                    <a class="pure-button pure-button-primary v-box friend_button">Add</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="pure-u-1-2 l-box">
+            <form class="pure-form">
+                <div class="pure-input-1">
+                    <label for="remove_friend">Remove Friend</label>
+                    <input class="pure-input-1" id="remove_friend" type="text" placeholder="Friend ID">
+                    <a class="pure-button pure-button-primary v-box remove_friend_button">Remove</a>
+                </div>
+            </form>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <h3>Following</h3>
+            <div class="followingList">
+                <table class="pure-table pure-table-horizontal pure-table-striped">
+                    <thead>
+                    <tr>
+                        <th>User ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class ="FollowingData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <h3>Followers</h3>
+            <div class="followersList">
+                <table class="pure-table pure-table-horizontal pure-table-striped">
+                    <thead>
+                    <tr>
+                        <th>User ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class ="FollowersData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <h3>Outgoing Friend Requests</h3>
+            <div class="outgoingList">
+                <table class="pure-table pure-table-horizontal pure-table-striped">
+                    <thead>
+                    <tr>
+                        <th>User ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class ="OutgoingData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <h3>Incoming Friend Requests</h3>
+            <div class="incomingList">
+                <table class="pure-table pure-table-horizontal pure-table-striped">
+                    <thead>
+                    <tr>
+                        <th>User ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class ="IncomingData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <form id="friends-post" class="modal">
+        <p></p>
+    </form>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chatter - Tweets</title>
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.modal.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link rel="stylesheet" href="/css/jquery.modal.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".tweet_button").click(function () {
+                var tweet_text = $("#tweet_text").val();
+                $.post("/rest/tweet/tweet",
+                        {
+                            message: tweet_text
+                        })
+                        .fail(function (data) {
+                            $("#tweet-post").find("p").text("Sorry! "+ data["responseText"]+ " The tweet not able to be posted, please try again!");
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function (data) {
+                            $("#tweet_text").val('');
+                            $("#tweet-post").find("p").text("The tweet was successful, the id is "+data);
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            }).on($.modal.CLOSE, function(event, modal) {
+                                var url = "/tweet.html";
+                                $(location).attr('href',url);
+                            });
+                        });
+            });
+            $(".remove_tweet_button").click(function () {
+                var remove_tweet = $("#remove_tweet").val();
+                $.post("/rest/tweet/destroy",
+                        {
+                            id: remove_tweet
+                        })
+                        .fail(function (data) {
+                            $("#tweet-post").find("p").text("Sorry! "+ data["responseText"]+ " The tweet not able to be removed, please try again!");
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function (data) {
+                            $("#remove_tweet").val('');
+                            $("#tweet-post").find("p").text("The tweet was successful removed, the id was "+data);
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            }).on($.modal.CLOSE, function(event, modal) {
+                                var url = "/tweet.html";
+                                $(location).attr('href',url);
+                            });
+                        });
+            });
+            $(".retweet_tweet_button").click(function () {
+                var retweet_tweet = $("#retweet_tweet").val();
+                $.post("/rest/tweet/retweet",
+                        {
+                            id: retweet_tweet
+                        })
+                        .fail(function (data) {
+                            $("#tweet-post").find("p").text("Sorry! "+ data["responseText"]+ " The tweet not able to be retweeted, please try again!");
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function (data) {
+                            $("#remove_tweet").val('');
+                            $("#tweet-post").find("p").text("The tweet was a successful retweet, the id of the retweet is "+data);
+                            $('#tweet-post').modal({
+                                fadeDuration: 100
+                            }).on($.modal.CLOSE, function(event, modal) {
+                                var url = "/tweet.html";
+                                $(location).attr('href',url);
+                            });
+                        });
+            });
+            $(".logout").click(function(){
+                var url = "/";
+                $.post("/rest/users/logout")
+                        .fail(function() {
+                            alert( "Sorry, something went wrong. Try again." );
+                        })
+                        .done(function() {
+                            $(location).attr('href',url);
+                        });
+            });
+            $.getJSON('/rest/tweet/getTweets', function(data) {
+                $.each(data, function(i, tweet) {
+                    $('.TweetData').append('<tr> <td>'+ tweet.tweetId + '</td>' +
+                                            '<td>' + tweet.userId + '</td>' +
+                                            '<td>' + tweet.message + '</td> </tr>');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="pure-menu pure-menu-open pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading">Chatter</a>
+
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li class="pure-menu-selected"><a href="/tweet.html">Tweet</a></li>
+            <li><a href="/friends.html">Friends</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a class="logout">Logout</a></li>
+        </ul>
+    </div>
+    <div class="pure-g l-box">
+        <div class="pure-u-1 l-box">
+            <form class="pure-form l-box">
+                <div class="pure-input-1">
+                    <label for="tweet_text">Tweet</label>
+                    <input class="pure-input-1" id="tweet_text" type="text" placeholder="Tweet">
+                    <a class="pure-button pure-button-primary v-box tweet_button">Tweet</a>
+                </div>
+            </form>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <form class="pure-form l-box">
+                <div class="pure-input-1">
+                    <label for="remove_tweet">Remove Tweet</label>
+                    <input class="pure-input-1" id="remove_tweet" type="text" placeholder="Tweet Id">
+                    <a class="pure-button pure-button-primary v-box remove_tweet_button">Remove</a>
+                </div>
+            </form>
+        </div>
+        <div class="pure-u-1-2 l-box">
+            <form class="pure-form l-box">
+                <div class="pure-input-1">
+                    <label for="retweet_tweet">Retweet Tweet</label>
+                    <input class="pure-input-1" id="retweet_tweet" type="text" placeholder="Tweet Id">
+                    <a class="pure-button pure-button-primary v-box retweet_tweet_button">Retweet</a>
+                </div>
+            </form>
+        </div>
+        <div class="pure-u-1-5"><!--Empty Spacing--></div>
+        <div class="pure-u-3-5">
+            <h2 class="center">Tweet List</h2>
+            <div class="tweetList">
+                <table class="pure-table pure-table-horizontal pure-table-striped" align="center">
+                    <thead>
+                        <tr>
+                            <th>Tweet ID</th>
+                            <th>User ID</th>
+                            <th>Tweet</th>
+                        </tr>
+                    </thead>
+                    <tbody class ="TweetData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pure-u-1-5"><!--Empty Spacing--></div>
+    </div>
+    <form id="tweet-post" class="modal">
+        <p></p>
+    </form>
+</body>
+</html>

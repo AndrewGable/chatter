@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chatter - Home</title>
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.modal.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link rel="stylesheet" href="/css/jquery.modal.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".login").click(function(){
+                var username = $("#username").val();
+                var url = "/tweet.html";
+                $.post("/rest/users/login/username",
+                        {
+                            username:username
+                        })
+                        .fail(function(data) {
+                            $("#login").find("p").text("Sorry! "+ data["responseText"] +", please try again. ");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function() {
+                            $(location).attr('href',url);
+                        });
+            });
+
+            $(".idLogin").click(function(){
+                var userId = $("#userId").val();
+                var url = "/tweet.html";
+                $.post("/rest/users/login",
+                        {
+                            userId:userId
+                        })
+                        .fail(function(data) {
+                            $("#login").find("p").text("Sorry! "+ data["responseText"] +", please try again. ");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function() {
+                            $(location).attr('href',url);
+                        });
+            });
+
+            $(".create_account").click(function(){
+                var username_new = $("#username_new").val();
+                var email_new = $("#email_new").val();
+                $.post("/rest/users/create",
+                        {
+                            username:username_new,
+                            email:email_new
+                        })
+                        .fail(function(data) {
+                            $("#login").find("p").text("Sorry! "+ data["responseText"] +", please try again. ");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function(data) {
+                            $("#username_new").val('');
+                            $("#email_new").val('');
+                            $("#password_new").val('');
+                            $("#login").find("p").text("The user was successfully created, the id was "+data +". " +
+                                    "Please login with your username.");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        });
+            });
+            $(".find_user_button").click(function() {
+                var username_find = $("#find_username").val();
+                $.get("/rest/users/"+username_find,
+                        {
+                            username:username_find
+                        })
+                        .fail(function(data) {
+                            $("#login").find("p").text("Sorry! "+ data["responseText"] +", please try again. ");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function(data) {
+                            $("#find_username").val('');
+                            $("#login").find("p").text("The user was found successfully, the id is "+data +". ");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        });
+            });
+            $(".logout").click(function() {
+                $.post("/rest/users/logout")
+                        .fail(function() {
+                            $('#login-error').modal({
+                                fadeDuration: 100
+                            });
+                        })
+                        .done(function() {
+                            $("#login").find("p").text("You've been logged out!");
+                            $('#login').modal({
+                                fadeDuration: 100
+                            });
+                        });
+            });
+            $('#login').on($.modal.CLOSE, function(event, modal) {
+                var url = "/";
+                $(location).attr('href',url);
+            });
+        });
+
+    </script>
+</head>
+    <body>
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <a href="/" class="pure-menu-heading">Chatter</a>
+
+            <ul>
+                <li class="pure-menu-selected"><a href="/">Home</a></li>
+                <li><a href="/tweet.html">Tweet</a></li>
+                <li><a href="/friends.html">Friends</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a class="logout">Logout</a></li>
+            </ul>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1"><img class="pure-img" src="/img/Bridge.jpg"></div>
+            <div class="pure-u-1-2 l-box">
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <h3>Login</h3>
+                        <label for="username">Username</label>
+                        <input id="username" type="text" placeholder="Username">
+                        <a class="pure-button pure-button-primary login">Sign in</a>
+                    </fieldset>
+                </form>
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <label for="userId">User ID</label>
+                        <input id="userId" type="text" placeholder="User ID">
+                        <a class="pure-button pure-button-primary idLogin">Sign in</a>
+                    </fieldset>
+                </form>
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <h3>Find User</h3>
+                        <label for="find_username">Username</label>
+                        <input id="find_username" type="text" placeholder="Username">
+                        <a class="pure-button pure-button-primary find_user_button">Find</a>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="pure-u-1-2 l-box">
+                <h3>New to Chatter?</h3>
+                <p>Chatter is the newest mix between Twitter and Facebook using an awesome RESTful API.</p>
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <input id="username_new" type="text" placeholder="Username">
+                        <input id="email_new" type="email" placeholder="Email">
+                        <input id="password_new" type="password" placeholder="Password">
+                        <a class="pure-button create_account">Create Account</a>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <form id="login" class="modal">
+            <p></p>
+        </form>
+    </body>
+</html>

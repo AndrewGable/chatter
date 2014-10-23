@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chatter - About</title>
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.modal.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link rel="stylesheet" href="/css/jquery.modal.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".logout").click(function(){
+                var url = "/";
+                $.post("/rest/users/logout")
+                        .fail(function() {
+                            alert( "Sorry, something went wrong. Try again." );
+                        })
+                        .done(function() {
+                            $(location).attr('href',url);
+                        });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="pure-menu pure-menu-open pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading">Chatter</a>
+
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/tweet.html">Tweet</a></li>
+            <li><a href="/friends.html">Friends</a></li>
+            <li class="pure-menu-selected"><a href="/about.html">About</a></li>
+            <li><a class="logout">Logout</a></li>
+        </ul>
+    </div>
+    <div class="pure-g">
+        <div class="pure-u-1 l-box">
+            <p class="lead">
+                Chatter was written for a Cloud Computing Course at Boise State. <br><br>
+                Make sure to read the information bellow this paragraph or the README included in the root directory to build correctly. It was styled for fun using
+                <a href="http://purecss.io/">Pure CSS</a> and uses a lot of <a href="http://jquery.com/">jQuery</a>. <br><br>
+                Check out my personal website at <a href="http://andrewcode.com/">andrewcode.com/</a>
+                <br><br>Thanks for checking chatter out,
+                <br>Andrew Gable
+            </p>
+            <br><hr>
+            <h2 id="andrew-gable-readme">Andrew Gable - README</h2>
+            <h2 id="cloud-computing-cs-497-dr-dialani">Cloud Computing CS 497 - Dr. Dialani</h2>
+            <h2 id="programming-assignment-1-chatter">Programming Assignment 1 - Chatter</h2>
+            <h3 id="database-build-">Database Build:</h3>
+            <ol>
+                <li>Create a user in mysql with username = root and password = pass</li>
+                <li>Create a database called chatterDB
+                    (mysqladmin -uroot -ppass create chatterDB)</li>
+                <li>Create all the tables for chatterDB
+                    (mysql -uroot -ppass chatterDB &lt; ChatterDBCreate.sql)</li>
+            </ol>
+            <h3 id="project-build-">Project Build:</h3>
+            <ol>
+                <li>Run &#39;mvn clean package&#39;</li>
+                <li>Change directories to &#39;target/&#39;</li>
+                <li>Project was built as &#39;ROOT.war&#39;
+                    (Why ROOT.war? It enables me to deploy Chatter to local host root and not as localhost:8080/Chatter/
+                    <em>Please</em> keep this the same because all jQuery calls are assuming this naming convention.)</li>
+                <li>Copy &#39;ROOT.war&#39; to tomcat deployment directory or deploy using the tomcat manager</li>
+                <li>Browse to root (<a href="http://localhost:8080/">http://localhost:8080/</a>) and Chatter should load (Should see a big picture of a guy with a surfboard)</li>
+            </ol>
+            <h3 id="project-structure-">Project Structure:</h3>
+            <ul>
+                <li>pom.xml - Various build dependencies and plugins used to build Chatter</li>
+                <li>ChatterDBCreate.sql - Database table builds</li>
+                <li>com.andrewcode.rest<ul>
+                    <li>Controllers<ul>
+                        <li>FriendService.Java Handles all of the friendships and followers rest calls</li>
+                        <li>TweetService.java Handles all of the tweet related rest calls</li>
+                        <li>UserService.java Handles the creation and login of users</li>
+                    </ul>
+                    </li>
+                    <li>Models<ul>
+                        <li>Friends.java Hibernate annotated model of table in MySql database</li>
+                        <li>Tweet.java Hibernate annotated model of table in MySql database</li>
+                        <li>User.java Hibernate annotated model of table in MySql database</li>
+                    </ul>
+                    </li>
+                    <li>Util<ul>
+                        <li>FriendException.java Exception handling for FriendService.java</li>
+                        <li>TweetException.java Exception handling for TweetService.java</li>
+                        <li>UserException.java Exception handing for UserService.java</li>
+                        <li>Utils.java Static helper methods that I did not want to copy over and over again</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+                <li>Resources<ul>
+                    <li>hibernate.cfg.xml Hibernate connector for hibernate orm library</li>
+                </ul>
+                </li>
+                <li>Webapp<ul>
+                    <li>css<ul>
+                        <li>jquery.modal.css CSS files for modals I am using in Views</li>
+                        <li>pure-min.css CSS framework used in all views of Chatter</li>
+                    </ul>
+                    </li>
+                    <li>img<ul>
+                        <li>close.png Close icon used for modals</li>
+                        <li>spinner.gif Spinner gif used for modals</li>
+                        <li>Surf.png Home page photograph</li>
+                    </ul>
+                    </li>
+                    <li>js<ul>
+                        <li>jquery.modal.min.js Modal javascript code used for modals in Chatter</li>
+                        <li>jquery-2.1.1.min.js jQuery used for many post and get calls</li>
+                    </ul>
+                    </li>
+                    <li>WEB-INF<ul>
+                        <li>web.xml Configuration file for Chatter</li>
+                    </ul>
+                    </li>
+                    <li>about.html About me page</li>
+                    <li>friends.html FriendService testing page includes all posts and get tests</li>
+                    <li>index.html UserService testing page includes login, create and find users tests</li>
+                    <li>tweet.html TweetService testing page includes all tweet method tests</li>
+                </ul>
+                </li>
+            </ul>
+            <h3 id="project-design-">Project Design:</h3>
+            <p>All rest calls have &#39;rest/&#39; appended to the url to designate rest calls from other web pages in Chatter. All &#39;POST&#39;
+                calls use the @FormParam and all &#39;GET&#39; calls use the @PathParam annotations. The project is broken up into three simple
+                services UserService, FriendService, and TweetService. All methods return JSON on success and a WebApplicationException
+                with an error message on an error.</p>
+            <h4 id="userservice-java">UserService.java</h4>
+            <pre><code>
+POST users/create/{user-name} - Create a user from specific user name
+GET users/{users-name} - Get a userId from a user name
+POST users/login/{userId} - Login passes a userId to set for the session
+            </code></pre><h4 id="friendservice-java">FriendService.Java</h4>
+            <pre><code>
+GET friendships/incoming - Returns the users incoming friendship requests
+GET friendships/outgoing - Returns the users outgoing friendship requests
+POST friendships/create - Create a friendship requests if you&#39;d like to accept a friendship request, send a create
+to that user id
+POST friendships/destroy - Destroys a friendship completely. Assumed this was a &#39;unfriend&#39; or &#39;block&#39; and not just
+an unfollow
+GET friends/list - Returns a list of userIds of people who the logged in user is following
+GET followers/list - Returns a list of userIds of people who are following the logged in user
+            </code></pre><h4 id="tweetservice-java">TweetService.java</h4>
+            <pre><code>
+POST tweet/tweet/{msg} - Create a tweet that is less that 128 character from passed in message
+GET tweet/show/{id} - Get a tweet from a specific id
+POST tweet/destroy/{id} - Delete a tweet from a specific id
+POST tweet/retweet/{id} - Retweet takes the tweet message, posts it again with a new tweetId and assigns the userId
+to the user who created the retweet.
+            </code></pre><h4 id="additional-rest-end-points-">Additional Rest End Points:</h4>
+            <pre><code>
+POST users/login/{user-name} - Login passes a *user-name* instead of a userId because it is easier for a user to
+remember a user name then a id
+GET tweet/getTweets - Returns a list of tweet objects for a users feed (i.e. the tweets from the user or tweets from
+the people the user is following)
+POST users/logout - Invalidates the users session (Really handy for testing multiple relationships between multiple
+users)
+            </code></pre><h3 id="comments-">Comments:</h3>
+            <p>I truly liked this project, I find this &#39;full-stack&#39; development fun and exciting. I hope to continue to develop chatter
+                as we cover more topics in this class and also improve my implementation. I know there are bugs in the code, and it is
+                not the most elegant with no AJAX calls. I would like to implement AJAX calls in the next version to add a better
+                user experience and also instead of returning userIds for all the tables I would really like to display user&#39;s names.</p>
+            <p>This was one of my favorite projects of my college career, I hope we continue to build on these topics and I become
+                a better developer of these technologies because they are definitely fun and powerful.</p>
+        </div>
+    </div>
+</body>
+</html>
