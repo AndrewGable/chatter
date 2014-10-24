@@ -1,13 +1,14 @@
 package com.andrewcode.rest.Controllers;
 
+import com.andrewcode.queue.Controllers.TaskQueue;
+import com.andrewcode.queue.Utils.ProcessingFactory;
+import com.andrewcode.queue.WorkItems.*;
 import com.andrewcode.rest.Models.User;
 import com.andrewcode.rest.Util.UserException;
-import com.andrewcode.rest.Util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
@@ -21,144 +22,93 @@ import javax.ws.rs.core.MediaType;
  * Created by andrew on 9/17/14.
  * LoginService.java
  */
+
 @Path("/users")
 public class UserService {
-    SessionFactory sessionFactory = Utils.createSessionFactory();
+
+    private final static String queueName = "processing-queue";
 
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
     public String loginUser(@FormParam("userId") Long userId,
-                            @Context HttpServletRequest req) throws UserException {
-        Long sessionUserId;
-        Session session = sessionFactory.openSession();
-        Gson gson = new GsonBuilder().create();
+                            @Context HttpServletRequest req) throws UserException, InterruptedException {
+        IdLogin request = new IdLogin(userId, req);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        User userEntity = (User) session.get(User.class, userId);
-
-        if (userEntity == null) {
-            throw new UserException("User not found");
-        } else {
-            try {
-                if (req == null) {
-                    throw new UserException("Null request in context");
-                } else {
-                    HttpSession httpSession = req.getSession();
-                    sessionUserId = (Long) httpSession.getAttribute("userId");
-                    if (sessionUserId == null) {
-                        sessionUserId = userEntity.getUserId();
-                        httpSession.setAttribute("userId", sessionUserId);
-                    }
-                }
-            } catch (Exception e) {
-                throw new UserException(e.getMessage());
-            }
+        if (queue != null) {
+            queue.add(request);
         }
-
-        return gson.toJson("Login Successful");
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @POST
     @Path("/login/username")
     @Produces(MediaType.APPLICATION_JSON)
     public String loginUsername(@FormParam("username") String user,
-                            @Context HttpServletRequest req) throws UserException {
-        Long userId;
-        Session session = sessionFactory.openSession();
-        Gson gson = new GsonBuilder().create();
+                            @Context HttpServletRequest req) throws UserException, InterruptedException {
+        UsernameLogin request = new UsernameLogin(user, req);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Criteria criteria = session.createCriteria(User.class);
-        User userEntity = (User)criteria.add(Restrictions.eq("name", user)).uniqueResult();
-
-        if (userEntity == null) {
-            throw new UserException("User not found");
-        } else {
-            try {
-                if (req == null) {
-                    throw new UserException("Null request in context");
-                } else {
-                    HttpSession httpSession = req.getSession();
-                    userId = (Long) httpSession.getAttribute("userId");
-                    if (userId == null) {
-                        userId = userEntity.getUserId();
-                        httpSession.setAttribute("userId", userId);
-                    }
-                }
-            } catch (Exception e) {
-                throw new UserException(e.getMessage());
-            }
+        if (queue != null) {
+            queue.add(request);
         }
-
-        return gson.toJson("Login Successful");
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @POST
     @Path("/create")
     @Produces(MediaType.APPLICATION_JSON)
     public String createUser(@FormParam("username") String user,
-                                @FormParam("email") String email) throws UserException {
+                                @FormParam("email") String email) throws UserException, InterruptedException {
+        CreateUser request = new CreateUser(user, email);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Gson gson = new GsonBuilder().create();
-
-        User existingUser = (User) session.createQuery("from User WHERE name= :name ").setParameter("name", user).uniqueResult();
-
-        if (existingUser != null) {
-            throw new UserException("Existing User with same username");
+        if (queue != null) {
+            queue.add(request);
         }
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
 
-        User userEntity = new User();
-        userEntity.setName(user);
-        userEntity.setEmail(email);
-
-        Long userId = (Long)session.save(userEntity);
-
-        transaction.commit();
-        session.close();
-
-        return gson.toJson(userId);
     }
 
     @GET
     @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getUsername(@PathParam("username") String username){
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Gson gson = new GsonBuilder().create();
-        Long userId;
+    public String getUsername(@PathParam("username") String username) throws InterruptedException {
+        GetUsername request = new GetUsername(username);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        User existingUser = (User) session.createQuery("from User WHERE name= :name ").setParameter("name", username).uniqueResult();
-
-        if (existingUser == null) {
-            throw new UserException("User doesn't exist with that username");
-        } else {
-            userId = existingUser.getUserId();
+        if (queue != null) {
+            queue.add(request);
         }
-
-        transaction.commit();
-        session.close();
-
-        return gson.toJson(userId);
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @POST
     @Path("/logout")
-    public String logout(@Context HttpServletRequest req){
-        Gson gson = new GsonBuilder().create();
-        try {
-            if (req == null) {
-                System.out.println("Null request in context");
-            } else {
-                HttpSession httpSession = req.getSession();
-                httpSession.invalidate();
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public String logout(@Context HttpServletRequest req) throws InterruptedException {
+        Logout request = new Logout(req);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        return gson.toJson("Logged out");
+        if (queue != null) {
+            queue.add(request);
+        }
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
 }
