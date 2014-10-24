@@ -1,8 +1,8 @@
 package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
-import com.andrewcode.rest.Models.Tweet;
-import com.andrewcode.rest.Util.TweetException;
+import com.andrewcode.rest.Models.Friends;
+import com.andrewcode.rest.Util.FriendException;
 import com.andrewcode.rest.Util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,47 +10,51 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.util.List;
+
 /**
  * Created by andrew on 10/24/14.
- * DestroyTweet.java
+ * DestroyFriendship.java
  */
-public class DestroyTweet implements WorkItem {
+public class DestroyFriendship implements WorkItem {
 
     boolean isProcessed = false;
 
     String response;
-    Long tweetId, userId;
+    Long userId, friendId;
 
     SessionFactory sessionFactory = Utils.createSessionFactory();
 
-    public DestroyTweet(Long tweetId, Long userId) {
-        this.tweetId = tweetId;
+    public DestroyFriendship(Long userId, Long friendId) {
         this.userId = userId;
+        this.friendId = friendId;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean process() {
-
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
-        Tweet tweetEntity = (Tweet)session.get(Tweet.class, tweetId);
-
-        if (tweetEntity == null) {
-            throw new TweetException("Tweet does not exist.");
+        if (userId == friendId) {
+            throw new FriendException("Cannot remove yourself as a friend.");
         }
 
-        if (userId != tweetEntity.getUserId()) {
-            throw new TweetException("Must be user who created tweet to delete.");
+        Friends friend = (Friends) session.createQuery("from Friends WHERE (userId= :id and friendsId = :friendId) " +
+                "or (userId= :friendId and friendsId = :id) ").setParameter("id", userId).setParameter("friendId", friendId).uniqueResult();
+
+        if (friend == null) {
+            throw new FriendException("Cannot remove friend that doesn't exist.");
         } else {
-            session.delete(tweetEntity);
+            //Other friend is not following back, just remove friendship
+            session.delete(friend);
         }
 
         transaction.commit();
         session.close();
 
-        response =  gson.toJson(tweetEntity.getTweetId());
+        response = gson.toJson(friendId);
 
         isProcessed = true;
         return isProcessed;

@@ -1,6 +1,7 @@
 package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
+import com.andrewcode.rest.Models.Friends;
 import com.andrewcode.rest.Models.Tweet;
 import com.andrewcode.rest.Util.TweetException;
 import com.andrewcode.rest.Util.Utils;
@@ -10,47 +11,46 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by andrew on 10/24/14.
- * DestroyTweet.java
+ * GetIncomingFriends.java
  */
-public class DestroyTweet implements WorkItem {
+public class GetIncomingFriends implements WorkItem {
 
     boolean isProcessed = false;
 
     String response;
-    Long tweetId, userId;
+    Long userId;
 
     SessionFactory sessionFactory = Utils.createSessionFactory();
 
-    public DestroyTweet(Long tweetId, Long userId) {
-        this.tweetId = tweetId;
+    public GetIncomingFriends(Long userId) {
         this.userId = userId;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean process() {
 
         Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
-        Tweet tweetEntity = (Tweet)session.get(Tweet.class, tweetId);
+        List<Friends> list = session.createQuery("from Friends WHERE friendsId= :id ").setParameter("id", userId).list();
 
-        if (tweetEntity == null) {
-            throw new TweetException("Tweet does not exist.");
+        ArrayList<Long> incomingFriends = new ArrayList<Long>();
+
+        for(Friends friend : list){
+            if(friend.getAccepted().equals("N")) {
+                incomingFriends.add(friend.getUserId());
+            }
         }
 
-        if (userId != tweetEntity.getUserId()) {
-            throw new TweetException("Must be user who created tweet to delete.");
-        } else {
-            session.delete(tweetEntity);
-        }
-
-        transaction.commit();
         session.close();
 
-        response =  gson.toJson(tweetEntity.getTweetId());
+        response = gson.toJson(incomingFriends);
 
         isProcessed = true;
         return isProcessed;
