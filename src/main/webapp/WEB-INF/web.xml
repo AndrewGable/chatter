@@ -2,10 +2,11 @@
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
 	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-	<display-name>Restful Web Application</display-name>
+	<display-name>Chatter with Monitor Service</display-name>
 
+    <!-- Set up the rest servlet -->
 	<servlet>
-		<servlet-name>jersey-serlvet</servlet-name>
+		<servlet-name>rest-serlvet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
@@ -14,13 +15,51 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>jersey-serlvet</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
-	</servlet-mapping>
+    <!-- Tell the rest servlet which urls to map -->
+    <servlet-mapping>
+        <servlet-name>rest-serlvet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
 
+    <!-- Set up the queue servlet -->
+    <servlet>
+        <servlet-name>queue-serlvet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.andrewcode.rest</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
+    <!-- Tell the queue servlet which urls to map -->
+    <servlet-mapping>
+        <servlet-name>queue-serlvet</servlet-name>
+        <url-pattern>/queue/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Set up the queue parameters -->
+    <context-param>
+        <param-name>workers</param-name>
+        <param-value>5</param-value>
+    </context-param>
+    <context-param>
+        <param-name>timeout</param-name>
+        <param-value>20</param-value>
+    </context-param>
+    <context-param>
+        <param-name>queueDepth</param-name>
+        <param-value>5000</param-value>
+    </context-param>
+
+    <!-- Set up the queue listener -->
+    <listener>
+        <listener-class>com.andrewcode.queue.Utils.ServletContextListener</listener-class>
+    </listener>
+
+    <!-- Set up the index.html to load -->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
 </web-app>

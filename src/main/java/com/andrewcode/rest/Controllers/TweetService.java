@@ -1,22 +1,14 @@
 package com.andrewcode.rest.Controllers;
 
-import com.andrewcode.rest.Models.Friends;
-import com.andrewcode.rest.Models.Tweet;
-import com.andrewcode.rest.Util.TweetException;
+import com.andrewcode.queue.Controllers.TaskQueue;
+import com.andrewcode.queue.Utils.ProcessingFactory;
+import com.andrewcode.queue.WorkItems.*;
 import com.andrewcode.rest.Util.Utils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by andrew on 9/17/14.
@@ -26,138 +18,92 @@ import java.util.List;
 @Path("/tweet")
 public class TweetService {
 
-    SessionFactory sessionFactory = Utils.createSessionFactory();
+    private final static String queueName = "processing-queue";
 
     @POST
     @Path("/tweet")
     @Produces(MediaType.APPLICATION_JSON)
     public String tweet(@FormParam("message") String message,
-                          @Context HttpServletRequest req) {
-        if (message.length() > 128) {
-            throw new TweetException("Tweet is too long, must be less that 128 characters.");
-        }
-
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Gson gson = new GsonBuilder().create();
-
+                          @Context HttpServletRequest req) throws InterruptedException {
         Long userId = Utils.getUserId(req);
+        PostTweet request = new PostTweet(message, userId);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Tweet tweet = new Tweet();
-        tweet.setMessage(message);
-        tweet.setUserId(userId);
-
-        Long tweetId = (Long)session.save(tweet);
-
-        transaction.commit();
-        session.close();
-
-        return gson.toJson(tweetId);
+        if (queue != null) {
+            queue.add(request);
+        }
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @GET
     @Path("/show/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getTweet(@PathParam("id") Long id){
-        Session session = sessionFactory.openSession();
+    public String getTweet(@PathParam("id") Long id) throws InterruptedException {
+        GetTweet request = new GetTweet(id);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Tweet tweetEntity = (Tweet)session.get(Tweet.class, id);
-
-        if (tweetEntity == null) {
-            throw new TweetException("Tweet does not exist.");
+        if (queue != null) {
+            queue.add(request);
         }
-
-        session.close();
-        return tweetEntity.getMessage();
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @POST
     @Path("/destroy")
     @Produces(MediaType.APPLICATION_JSON)
     public String removeTweet(@FormParam("id") Long id,
-                              @Context HttpServletRequest req) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Gson gson = new GsonBuilder().create();
-
+                              @Context HttpServletRequest req) throws InterruptedException {
         Long userId = Utils.getUserId(req);
+        DestroyTweet request = new DestroyTweet(id, userId);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Tweet tweetEntity = (Tweet)session.get(Tweet.class, id);
-
-        if (tweetEntity == null) {
-            throw new TweetException("Tweet does not exist.");
+        if (queue != null) {
+            queue.add(request);
         }
-
-        if (userId != tweetEntity.getUserId()) {
-            throw new TweetException("Must be user who created tweet to delete.");
-        } else {
-            session.delete(tweetEntity);
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
         }
-
-        transaction.commit();
-        session.close();
-
-        return gson.toJson(tweetEntity.getTweetId());
+        return request.getResponse();
     }
 
     @POST
     @Path("/retweet")
     @Produces(MediaType.APPLICATION_JSON)
     public String retweetTweet(@FormParam("id") Long id,
-                                @Context HttpServletRequest req) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Gson gson = new GsonBuilder().create();
-
+                                @Context HttpServletRequest req) throws InterruptedException {
         Long userId = Utils.getUserId(req);
+        RetweetTweet request = new RetweetTweet(id, userId);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        Tweet tweetEntity = (Tweet)session.get(Tweet.class, id);
-
-        if (tweetEntity == null) {
-            throw new TweetException("Tweet does not exist.");
+        if (queue != null) {
+            queue.add(request);
         }
-
-        Tweet retweet = new Tweet();
-        retweet.setMessage(tweetEntity.getMessage());
-        retweet.setUserId(userId);
-
-        Long tweetId = (Long)session.save(retweet);
-
-        transaction.commit();
-        session.close();
-
-        return gson.toJson(tweetId);
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 
     @GET
     @Path("/getTweets")
     @Produces(MediaType.APPLICATION_JSON)
-    @SuppressWarnings("unchecked")
-    public String getTweets(@Context HttpServletRequest req) {
-        Session session = sessionFactory.openSession();
-        Gson gson = new GsonBuilder().create();
-
+    public String getTweets(@Context HttpServletRequest req) throws InterruptedException {
         Long userId = Utils.getUserId(req);
+        GetTweetList request = new GetTweetList(userId);
+        TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
-        List<Friends> list = session.createQuery("from Friends WHERE userId= :id or friendsId= :id").setParameter("id", userId).list();
-
-        ArrayList<Long> following = new ArrayList<Long>();
-
-        for(Friends friend : list) {
-            if (friend.getUserId() == userId) {
-                //Use the friendId
-                following.add(friend.getFriendsId());
-            } else if (friend.getAccepted().equals("Y")) {
-                //Use the userId & check to see if they are following each other
-                following.add(friend.getUserId());
-            }
+        if (queue != null) {
+            queue.add(request);
         }
-        following.add(userId);
-
-        List<Tweet> tweets = (List<Tweet>) session.createQuery("from Tweet WHERE userId IN (:id)").setParameterList("id", following).list();
-
-        session.close();
-
-        return gson.toJson(tweets);
+        while (!request.isCompleted()) {
+            Thread.sleep(5);
+        }
+        return request.getResponse();
     }
 }
