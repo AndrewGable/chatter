@@ -22,12 +22,12 @@ public class Logout implements WorkItem {
     boolean isProcessed = false;
 
     String response;
-    HttpServletRequest req;
+    HttpSession httpSession;
 
     SessionFactory sessionFactory = Utils.createSessionFactory();
 
-    public Logout(HttpServletRequest req) {
-        this.req = req;
+    public Logout(HttpSession httpSession) {
+        this.httpSession = httpSession;
     }
 
     @Override
@@ -35,12 +35,7 @@ public class Logout implements WorkItem {
     public boolean process() {
         Gson gson = new GsonBuilder().create();
         try {
-            if (req == null) {
-                System.out.println("Null request in context");
-            } else {
-                HttpSession httpSession = req.getSession();
-                httpSession.invalidate();
-            }
+            httpSession.invalidate();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

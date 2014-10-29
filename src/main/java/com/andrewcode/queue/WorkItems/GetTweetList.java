@@ -50,7 +50,7 @@ public class GetTweetList implements WorkItem {
         }
         following.add(userId);
 
-        List<Tweet> tweets = (List<Tweet>) session.createQuery("from Tweet WHERE userId IN (:id)").setParameterList("id", following).list();
+        List<Tweet> tweets = (List<Tweet>) session.createQuery("from Tweet WHERE userId IN (:id) ORDER BY tweetId desc").setParameterList("id", following).list();
 
         session.close();
 

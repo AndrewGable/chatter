@@ -23,18 +23,17 @@ public class UsernameLogin implements WorkItem {
     boolean isProcessed = false;
 
     String response;
-    HttpServletRequest req;
+    HttpSession httpSession;
     String user;
 
     SessionFactory sessionFactory = Utils.createSessionFactory();
 
-    public UsernameLogin(String user, HttpServletRequest req) {
+    public UsernameLogin(String user, HttpSession httpSession) {
         this.user = user;
-        this.req = req;
+        this.httpSession = httpSession;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean process() {
         Long userId;
         Session session = sessionFactory.openSession();
@@ -47,17 +46,13 @@ public class UsernameLogin implements WorkItem {
             throw new UserException("User not found");
         } else {
             try {
-                if (req == null) {
-                    throw new UserException("Null request in context");
-                } else {
-                    HttpSession httpSession = req.getSession();
-                    userId = (Long) httpSession.getAttribute("userId");
-                    if (userId == null) {
-                        userId = userEntity.getUserId();
-                        httpSession.setAttribute("userId", userId);
-                    }
+                userId = (Long) httpSession.getAttribute("userId");
+                if (userId == null) {
+                    userId = userEntity.getUserId();
+                    httpSession.setAttribute("userId", userId);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new UserException(e.getMessage());
             }
         }

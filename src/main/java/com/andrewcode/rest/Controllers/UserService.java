@@ -32,7 +32,7 @@ public class UserService {
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
     public String loginUser(@FormParam("userId") Long userId,
-                            @Context HttpServletRequest req) throws UserException, InterruptedException {
+                            @Context HttpServletRequest req) throws InterruptedException {
         IdLogin request = new IdLogin(userId, req);
         TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
@@ -50,7 +50,11 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public String loginUsername(@FormParam("username") String user,
                             @Context HttpServletRequest req) throws UserException, InterruptedException {
-        UsernameLogin request = new UsernameLogin(user, req);
+        if (req == null) {
+            throw new UserException("Null request in context");
+        }
+
+        UsernameLogin request = new UsernameLogin(user, req.getSession());
         TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
         if (queue != null) {
@@ -99,7 +103,11 @@ public class UserService {
     @POST
     @Path("/logout")
     public String logout(@Context HttpServletRequest req) throws InterruptedException {
-        Logout request = new Logout(req);
+        if (req == null) {
+            System.out.println("Null request in context");
+        }
+
+        Logout request = new Logout(req.getSession());
         TaskQueue queue = ProcessingFactory.getTaskQueue(queueName);
 
         if (queue != null) {
