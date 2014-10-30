@@ -103,47 +103,36 @@ public class MonitorService {
         Session session = sessionFactory.openSession();
         Gson gson = new GsonBuilder().create();
 
-        String lastChar = resolution.substring(resolution.length() - 1);
-        String time = resolution.substring(0, resolution.length() - 1);
-
         // Minute
-        if (lastChar.equals("m")) {
-            long MIN_IN_MS = 1000 * 60 * Integer.parseInt(time);
+        if (resolution.equals("minutes")) {
+            long MIN_IN_MS = 1000 * 60 * 100;
             Date startDate = new Date(System.currentTimeMillis() - (MIN_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            //criteria.setMaxResults(100);
-            session.close();
             return gson.toJson(criteria.list().size());
         }
         // Hours
-        else if (lastChar.equals("h")) {
-            long HOUR_IN_MS = 1000 * 60 * 60 * Integer.parseInt(time);
+        else if (resolution.equals("hours")) {
+            long HOUR_IN_MS = 1000 * 60 * 60 * 100;
             Date startDate = new Date(System.currentTimeMillis() - (HOUR_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            //criteria.setMaxResults(100);
-            session.close();
             return gson.toJson(criteria.list().size());
         }
         // Days
-        else if (lastChar.equals("d")) {
-            long DAYS_IN_MS = 1000 * 60 * 60 * 24 * Integer.parseInt(time);
+        else if (resolution.equals("days")) {
+            long DAYS_IN_MS = 100 * 24L * 60 * 60 * 1000;
             Date startDate = new Date(System.currentTimeMillis() - (DAYS_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            //criteria.setMaxResults(100);
-            session.close();
             return gson.toJson(criteria.list().size());
         }
         // Months
-        else if (lastChar.equals("M")) {
-            long MONTHS_IN_MS = 1000 * 60 * 60 * 24 * 30 * Integer.parseInt(time);
+        else if (resolution.equals("months")) {
+            long MONTHS_IN_MS = 100 * 30 * 24L * 60 * 60 * 1000;
             Date startDate = new Date(System.currentTimeMillis() - (MONTHS_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            //criteria.setMaxResults(100);
-            session.close();
             return gson.toJson(criteria.list().size());
         }
         // Throw an exception

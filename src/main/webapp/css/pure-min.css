@@ -73,3 +73,11 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
 pre code {
     line-height: 130%;
 }
+
+.canvas-center {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
