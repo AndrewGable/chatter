@@ -1,7 +1,9 @@
 package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
+import com.andrewcode.rest.Models.Errors;
 import com.andrewcode.rest.Models.Friends;
+import com.andrewcode.rest.Models.Queue;
 import com.andrewcode.rest.Util.FriendException;
 import com.andrewcode.rest.Util.Utils;
 import com.google.gson.Gson;
@@ -11,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,11 +37,21 @@ public class CreateFriendship implements WorkItem {
     @Override
     @SuppressWarnings("unchecked")
     public boolean process() {
+        final long startTime = System.currentTimeMillis();
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
         if(userId == friendId){
+            // Log the exception
+            Errors error = new Errors();
+            error.setErrorCode(400);
+            error.setDate(new Date());
+            error.setException("FriendException");
+            session.save(error);
+            transaction.commit();
+            session.close();
+
             throw new FriendException("Cannot add yourself as a friend.");
         }
 
@@ -58,6 +71,15 @@ public class CreateFriendship implements WorkItem {
                     isProcessed = true;
                     return isProcessed;
                 } else if (friend.getFriendsId() == friendId && friend.getAccepted().equals("Y")) {
+                    // Log the exception
+                    Errors error = new Errors();
+                    error.setErrorCode(400);
+                    error.setDate(new Date());
+                    error.setException("FriendException");
+                    session.save(error);
+                    transaction.commit();
+                    session.close();
+
                     //Duplicate friend
                     throw new FriendException("Duplicate friend request to same person.");
                 }
@@ -76,6 +98,12 @@ public class CreateFriendship implements WorkItem {
             friend.setAccepted("N");
             session.save(friend);
         }
+
+        Queue queue = new Queue();
+        queue.setTask(this.getClass().getSimpleName());
+        queue.setTime(System.currentTimeMillis() - startTime);
+        queue.setDate(new Date());
+        session.save(queue);
 
         transaction.commit();
         session.close();

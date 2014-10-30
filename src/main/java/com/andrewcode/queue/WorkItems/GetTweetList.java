@@ -2,14 +2,17 @@ package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
 import com.andrewcode.rest.Models.Friends;
+import com.andrewcode.rest.Models.Queue;
 import com.andrewcode.rest.Models.Tweet;
 import com.andrewcode.rest.Util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +35,10 @@ public class GetTweetList implements WorkItem {
     @Override
     @SuppressWarnings("unchecked")
     public boolean process() {
+        final long startTime = System.currentTimeMillis();
+
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
         List<Friends> list = session.createQuery("from Friends WHERE userId= :id or friendsId= :id").setParameter("id", userId).list();
@@ -52,6 +58,13 @@ public class GetTweetList implements WorkItem {
 
         List<Tweet> tweets = (List<Tweet>) session.createQuery("from Tweet WHERE userId IN (:id) ORDER BY tweetId desc").setParameterList("id", following).list();
 
+        Queue queue = new Queue();
+        queue.setTask(this.getClass().getSimpleName());
+        queue.setTime(System.currentTimeMillis() - startTime);
+        queue.setDate(new Date());
+        session.save(queue);
+
+        transaction.commit();
         session.close();
 
         response =  gson.toJson(tweets);

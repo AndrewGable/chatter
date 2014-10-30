@@ -1,7 +1,9 @@
 package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
+import com.andrewcode.rest.Models.Errors;
 import com.andrewcode.rest.Models.Friends;
+import com.andrewcode.rest.Models.Queue;
 import com.andrewcode.rest.Models.User;
 import com.andrewcode.rest.Util.FriendException;
 import com.andrewcode.rest.Util.UserException;
@@ -14,6 +16,7 @@ import org.hibernate.Transaction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,17 +41,37 @@ public class IdLogin implements WorkItem {
     @Override
     @SuppressWarnings("unchecked")
     public boolean process() {
+        final long startTime = System.currentTimeMillis();
         Long sessionUserId;
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
         User userEntity = (User) session.get(User.class, userId);
 
         if (userEntity == null) {
+            // Log the exception
+            Errors error = new Errors();
+            error.setErrorCode(400);
+            error.setDate(new Date());
+            error.setException("UserException");
+            session.save(error);
+            transaction.commit();
+            session.close();
+
             throw new UserException("User not found");
         } else {
             try {
                 if (req == null) {
+                    // Log the exception
+                    Errors error = new Errors();
+                    error.setErrorCode(400);
+                    error.setDate(new Date());
+                    error.setException("UserException");
+                    session.save(error);
+                    transaction.commit();
+                    session.close();
+
                     throw new UserException("Null request in context");
                 } else {
                     HttpSession httpSession = req.getSession();
@@ -59,9 +82,28 @@ public class IdLogin implements WorkItem {
                     }
                 }
             } catch (Exception e) {
+                // Log the exception
+                Errors error = new Errors();
+                error.setErrorCode(400);
+                error.setDate(new Date());
+                error.setException("UserException");
+                session.save(error);
+                transaction.commit();
+                session.close();
+
                 throw new UserException(e.getMessage());
             }
         }
+
+        Queue queue = new Queue();
+        queue.setTask(this.getClass().getSimpleName());
+        queue.setTime(System.currentTimeMillis() - startTime);
+        queue.setDate(new Date());
+        session.save(queue);
+
+        transaction.commit();
+        session.close();
+
         response = gson.toJson("Login Successful");
 
         isProcessed = true;

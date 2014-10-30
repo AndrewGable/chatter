@@ -2,13 +2,16 @@ package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
 import com.andrewcode.rest.Models.Friends;
+import com.andrewcode.rest.Models.Queue;
 import com.andrewcode.rest.Util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,7 +34,9 @@ public class GetOutgoingFriends implements WorkItem {
     @Override
     @SuppressWarnings("unchecked")
     public boolean process() {
+        final long startTime = System.currentTimeMillis();
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
         List<Friends> list = session.createQuery("from Friends WHERE userId= :id ").setParameter("id", userId).list();
@@ -44,6 +49,13 @@ public class GetOutgoingFriends implements WorkItem {
             }
         }
 
+        Queue queue = new Queue();
+        queue.setTask(this.getClass().getSimpleName());
+        queue.setTime(System.currentTimeMillis() - startTime);
+        queue.setDate(new Date());
+        session.save(queue);
+
+        transaction.commit();
         session.close();
 
         response = gson.toJson(outgoingFriends);

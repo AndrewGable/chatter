@@ -1,6 +1,8 @@
 package com.andrewcode.queue.WorkItems;
 
 import com.andrewcode.queue.Utils.WorkItem;
+import com.andrewcode.rest.Models.Errors;
+import com.andrewcode.rest.Models.Queue;
 import com.andrewcode.rest.Models.User;
 import com.andrewcode.rest.Util.UserException;
 import com.andrewcode.rest.Util.Utils;
@@ -9,10 +11,12 @@ import com.google.gson.GsonBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * Created by andrew on 10/24/14.
@@ -35,14 +39,25 @@ public class UsernameLogin implements WorkItem {
 
     @Override
     public boolean process() {
+        final long startTime = System.currentTimeMillis();
         Long userId;
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
         Gson gson = new GsonBuilder().create();
 
         Criteria criteria = session.createCriteria(User.class);
         User userEntity = (User)criteria.add(Restrictions.eq("name", user)).uniqueResult();
 
         if (userEntity == null) {
+            // Log the exception
+            Errors error = new Errors();
+            error.setErrorCode(400);
+            error.setDate(new Date());
+            error.setException("UserException");
+            session.save(error);
+            transaction.commit();
+            session.close();
+
             throw new UserException("User not found");
         } else {
             try {
@@ -52,10 +67,27 @@ public class UsernameLogin implements WorkItem {
                     httpSession.setAttribute("userId", userId);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // Log the exception
+                Errors error = new Errors();
+                error.setErrorCode(400);
+                error.setDate(new Date());
+                error.setException("UserException");
+                session.save(error);
+                transaction.commit();
+                session.close();
+
                 throw new UserException(e.getMessage());
             }
         }
+
+        Queue queue = new Queue();
+        queue.setTask(this.getClass().getSimpleName());
+        queue.setTime(System.currentTimeMillis() - startTime);
+        queue.setDate(new Date());
+        session.save(queue);
+
+        transaction.commit();
+        session.close();
 
         response = gson.toJson("Login Successful");
 

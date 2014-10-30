@@ -4,6 +4,7 @@ import com.andrewcode.queue.Controllers.TaskQueue;
 import com.andrewcode.queue.Utils.ProcessingFactory;
 import com.andrewcode.queue.WorkItems.*;
 import com.andrewcode.rest.Util.Utils;
+import org.hibernate.SessionFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -35,6 +36,7 @@ public class TweetService {
         while (!request.isCompleted()) {
             Thread.sleep(5);
         }
+
         return request.getResponse();
     }
 
