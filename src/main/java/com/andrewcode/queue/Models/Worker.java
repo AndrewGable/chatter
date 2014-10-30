@@ -2,6 +2,7 @@ package com.andrewcode.queue.Models;
 
 import com.andrewcode.queue.Utils.WorkItem;
 
+import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -25,7 +26,11 @@ public class Worker implements Runnable {
 
             WorkItem item = workQueue.poll();
             if (item != null) {
-                item.process();
+                try {
+                    item.process();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
             } else {
                 try {
                     Thread.currentThread().sleep(10);

@@ -3,17 +3,31 @@
     "-//Hibernate/Hibernate Configuration DTD//EN"
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-  <session-factory>
-    <property name="connection.url">jdbc:mysql://132.178.129.2:3306/chatterDB</property>
-    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="connection.username">andrew</property>
-    <property name="connection.password">pass</property>
-      <mapping class="com.andrewcode.rest.Models.Friends"/>
-      <mapping class="com.andrewcode.rest.Models.Queue"/>
-      <mapping class="com.andrewcode.rest.Models.Tweet"/>
-      <mapping class="com.andrewcode.rest.Models.User"/>
-      <mapping class="com.andrewcode.rest.Models.Errors"/>
-      <!-- DB schema will be updated if needed -->
-    <!-- <property name="hbm2ddl.auto">update</property> -->
-  </session-factory>
+    <session-factory>
+        <property name="connection.url">jdbc:mysql://132.178.129.2:3306/chatterDB</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.username">andrew</property>
+        <property name="connection.password">pass</property>
+        <property name="connection.pool_size">10</property>
+        <mapping class="com.andrewcode.rest.Models.Friends"/>
+        <mapping class="com.andrewcode.rest.Models.Queue"/>
+        <mapping class="com.andrewcode.rest.Models.Tweet"/>
+        <mapping class="com.andrewcode.rest.Models.User"/>
+        <mapping class="com.andrewcode.rest.Models.Errors"/>
+    </session-factory>
 </hibernate-configuration>
+
+
+<!--<hibernate-configuration>-->
+    <!--<session-factory>-->
+        <!--<property name="connection.url">jdbc:mysql://localhost:3306/chatterDB</property>-->
+        <!--<property name="connection.driver_class">com.mysql.jdbc.Driver</property>-->
+        <!--<property name="connection.username">root</property>-->
+        <!--<property name="connection.password">pass</property>-->
+        <!--<mapping class="com.andrewcode.rest.Models.Friends"/>-->
+        <!--<mapping class="com.andrewcode.rest.Models.Queue"/>-->
+        <!--<mapping class="com.andrewcode.rest.Models.Tweet"/>-->
+        <!--<mapping class="com.andrewcode.rest.Models.User"/>-->
+        <!--<mapping class="com.andrewcode.rest.Models.Errors"/>-->
+    <!--</session-factory>-->
+<!--</hibernate-configuration>-->

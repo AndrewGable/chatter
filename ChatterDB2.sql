@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.20)
 # Database: ChatterDB
-# Generation Time: 2014-10-30 21:37:21 +0000
+# Generation Time: 2014-10-30 22:50:45 +0000
 # ************************************************************
 
 
@@ -30,18 +30,21 @@ CREATE TABLE `Errors` (
   `error_code` int(11) DEFAULT NULL,
   `date` datetime DEFAULT NULL,
   `exception` varchar(256) DEFAULT NULL,
+  `server_name` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `Errors` WRITE;
 /*!40000 ALTER TABLE `Errors` DISABLE KEYS */;
 
-INSERT INTO `Errors` (`id`, `error_code`, `date`, `exception`)
+INSERT INTO `Errors` (`id`, `error_code`, `date`, `exception`, `server_name`)
 VALUES
-	(1,400,'2014-10-29 21:44:09','UserException'),
-	(2,400,'2014-10-29 21:44:25','TweetException'),
-	(3,400,'2014-10-30 15:19:57','ResolutionException'),
-	(4,400,'2014-10-30 15:26:04','TweetException');
+	(1,400,'2014-10-29 21:44:09','UserException',NULL),
+	(2,400,'2014-10-29 21:44:25','TweetException',NULL),
+	(3,400,'2014-10-30 15:19:57','ResolutionException',NULL),
+	(4,400,'2014-10-30 15:26:04','TweetException',NULL),
+	(5,400,'2014-10-30 16:37:27','TweetException',NULL),
+	(6,400,'2014-10-30 16:47:18','TweetException','Andrews-MacBook-Pro.local');
 
 /*!40000 ALTER TABLE `Errors` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -94,148 +97,34 @@ CREATE TABLE `Queue` (
   `time` bigint(255) NOT NULL,
   `task` varchar(256) NOT NULL DEFAULT '',
   `date` datetime DEFAULT NULL,
+  `server_name` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `Queue` WRITE;
 /*!40000 ALTER TABLE `Queue` DISABLE KEYS */;
 
-INSERT INTO `Queue` (`id`, `time`, `task`, `date`)
+INSERT INTO `Queue` (`id`, `time`, `task`, `date`, `server_name`)
 VALUES
-	(2,17,'PostTweet','2014-10-29 20:03:58'),
-	(3,3,'PostTweet','2014-10-29 20:09:17'),
-	(4,182,'GetTweetList','2014-10-29 20:15:06'),
-	(5,7,'PostTweet','2014-10-29 20:15:12'),
-	(6,36,'GetTweetList','2014-10-29 20:15:14'),
-	(7,39,'DestroyTweet','2014-10-29 20:15:18'),
-	(8,30,'GetTweetList','2014-10-29 20:15:19'),
-	(9,4,'RetweetTweet','2014-10-29 20:15:27'),
-	(10,30,'GetTweetList','2014-10-29 20:15:28'),
-	(11,196,'GetTweetList','2014-10-29 20:18:14'),
-	(12,7,'PostTweet','2014-10-29 20:18:19'),
-	(13,38,'GetTweetList','2014-10-29 20:18:21'),
-	(14,28,'GetTweetList','2014-10-29 20:18:30'),
-	(15,39,'GetTweetList','2014-10-29 20:18:31'),
-	(16,30,'GetTweetList','2014-10-29 20:18:32'),
-	(17,30,'GetTweetList','2014-10-29 20:18:32'),
-	(18,24,'GetTweetList','2014-10-29 20:18:33'),
-	(19,24,'GetTweetList','2014-10-29 20:18:37'),
-	(20,23,'GetTweetList','2014-10-29 20:18:38'),
-	(21,20,'GetTweetList','2014-10-29 20:18:39'),
-	(22,12,'UsernameLogin','2014-10-29 20:33:12'),
-	(23,194,'GetTweetList','2014-10-29 20:33:12'),
-	(24,11,'GetIncomingFriends','2014-10-29 20:33:15'),
-	(25,17,'GetFollowers','2014-10-29 20:33:15'),
-	(26,18,'GetOutgoingFriends','2014-10-29 20:33:15'),
-	(27,11,'GetFollowing','2014-10-29 20:33:15'),
-	(28,14,'CreateFriendship','2014-10-29 20:33:18'),
-	(29,12,'GetFollowing','2014-10-29 20:33:18'),
-	(30,12,'GetOutgoingFriends','2014-10-29 20:33:18'),
-	(31,19,'GetFollowers','2014-10-29 20:33:18'),
-	(32,7,'GetIncomingFriends','2014-10-29 20:33:18'),
-	(33,9,'DestroyFriendship','2014-10-29 20:33:40'),
-	(34,10,'GetFollowers','2014-10-29 20:33:40'),
-	(35,12,'GetOutgoingFriends','2014-10-29 20:33:40'),
-	(36,8,'GetIncomingFriends','2014-10-29 20:33:40'),
-	(37,8,'GetFollowing','2014-10-29 20:33:40'),
-	(38,9,'GetOutgoingFriends','2014-10-29 20:33:44'),
-	(39,8,'GetFollowing','2014-10-29 20:33:44'),
-	(40,11,'GetFollowers','2014-10-29 20:33:44'),
-	(41,33,'GetIncomingFriends','2014-10-29 20:33:44'),
-	(42,43,'GetTweetList','2014-10-29 20:33:47'),
-	(43,27,'GetTweetList','2014-10-29 20:33:48'),
-	(44,22,'GetTweetList','2014-10-29 20:33:48'),
-	(45,3,'PostTweet','2014-10-29 20:33:51'),
-	(46,25,'GetTweetList','2014-10-29 20:33:52'),
-	(47,7,'GetFollowing','2014-10-29 20:34:22'),
-	(48,8,'GetFollowers','2014-10-29 20:34:22'),
-	(49,6,'GetOutgoingFriends','2014-10-29 20:34:22'),
-	(50,6,'GetIncomingFriends','2014-10-29 20:34:22'),
-	(51,45,'UsernameLogin','2014-10-29 20:51:24'),
-	(52,360,'GetTweetList','2014-10-29 20:51:25'),
-	(53,78,'UsernameLogin','2014-10-29 21:00:46'),
-	(54,200,'GetTweetList','2014-10-29 21:00:47'),
-	(55,9,'UsernameLogin','2014-10-29 21:44:19'),
-	(56,410,'GetTweetList','2014-10-29 21:44:19'),
-	(57,208,'UsernameLogin','2014-10-29 21:55:58'),
-	(58,195,'GetTweetList','2014-10-29 21:55:59'),
-	(59,330,'GetTweetList','2014-10-29 22:29:40'),
-	(60,15,'GetTweetList','2014-10-29 22:29:42'),
-	(61,61,'UsernameLogin','2014-10-30 15:06:12'),
-	(62,345,'GetTweetList','2014-10-30 15:06:12'),
-	(63,35,'GetTweetList','2014-10-30 15:06:13'),
-	(64,29,'GetTweetList','2014-10-30 15:06:14'),
-	(65,34,'GetTweetList','2014-10-30 15:06:15'),
-	(66,27,'GetTweetList','2014-10-30 15:06:15'),
-	(67,34,'GetTweetList','2014-10-30 15:06:16'),
-	(68,28,'GetTweetList','2014-10-30 15:06:16'),
-	(69,37,'GetTweetList','2014-10-30 15:06:16'),
-	(70,26,'GetTweetList','2014-10-30 15:06:17'),
-	(71,32,'GetTweetList','2014-10-30 15:06:17'),
-	(72,31,'GetTweetList','2014-10-30 15:06:17'),
-	(73,29,'GetTweetList','2014-10-30 15:06:17'),
-	(74,26,'GetTweetList','2014-10-30 15:06:18'),
-	(75,24,'GetTweetList','2014-10-30 15:06:18'),
-	(76,20,'GetTweetList','2014-10-30 15:06:18'),
-	(77,23,'GetTweetList','2014-10-30 15:06:19'),
-	(78,31,'GetTweetList','2014-10-30 15:06:20'),
-	(79,27,'UsernameLogin','2014-10-30 15:20:30'),
-	(80,197,'GetTweetList','2014-10-30 15:20:31'),
-	(81,247,'GetTweetList','2014-10-30 15:23:28'),
-	(82,17,'GetTweetList','2014-10-30 15:23:28'),
-	(83,12,'GetTweetList','2014-10-30 15:23:29'),
-	(84,13,'GetTweetList','2014-10-30 15:23:30'),
-	(85,23,'GetOutgoingFriends','2014-10-30 15:23:36'),
-	(86,23,'GetFollowers','2014-10-30 15:23:36'),
-	(87,10,'GetIncomingFriends','2014-10-30 15:23:36'),
-	(88,9,'GetFollowing','2014-10-30 15:23:36'),
-	(89,6,'GetOutgoingFriends','2014-10-30 15:23:39'),
-	(90,10,'GetIncomingFriends','2014-10-30 15:23:39'),
-	(91,10,'GetFollowing','2014-10-30 15:23:39'),
-	(92,9,'GetFollowers','2014-10-30 15:23:39'),
-	(93,14,'GetFollowers','2014-10-30 15:24:16'),
-	(94,8,'GetIncomingFriends','2014-10-30 15:24:16'),
-	(95,9,'GetFollowing','2014-10-30 15:24:16'),
-	(96,7,'GetOutgoingFriends','2014-10-30 15:24:16'),
-	(97,4,'UsernameLogin','2014-10-30 15:25:16'),
-	(98,35,'GetTweetList','2014-10-30 15:25:16'),
-	(99,37,'PostTweet','2014-10-30 15:25:55'),
-	(100,31,'GetTweetList','2014-10-30 15:25:56'),
-	(101,25,'GetTweetList','2014-10-30 15:28:40'),
-	(102,10,'GetOutgoingFriends','2014-10-30 15:28:42'),
-	(103,73,'GetFollowers','2014-10-30 15:28:43'),
-	(104,9,'GetFollowing','2014-10-30 15:28:43'),
-	(105,9,'GetIncomingFriends','2014-10-30 15:28:43'),
-	(106,10,'GetFollowers','2014-10-30 15:28:44'),
-	(107,11,'GetOutgoingFriends','2014-10-30 15:28:44'),
-	(108,16,'GetFollowing','2014-10-30 15:28:44'),
-	(109,15,'GetIncomingFriends','2014-10-30 15:28:44'),
-	(110,9,'GetFollowers','2014-10-30 15:28:45'),
-	(111,8,'GetIncomingFriends','2014-10-30 15:28:45'),
-	(112,7,'GetFollowing','2014-10-30 15:28:45'),
-	(113,9,'GetOutgoingFriends','2014-10-30 15:28:45'),
-	(114,12,'GetTweetList','2014-10-30 15:28:46'),
-	(115,10,'GetTweetList','2014-10-30 15:28:47'),
-	(116,7,'GetIncomingFriends','2014-10-30 15:28:47'),
-	(117,8,'GetOutgoingFriends','2014-10-30 15:28:47'),
-	(118,8,'GetFollowing','2014-10-30 15:28:47'),
-	(119,7,'GetFollowers','2014-10-30 15:28:47'),
-	(120,7,'GetFollowers','2014-10-30 15:28:48'),
-	(121,6,'GetOutgoingFriends','2014-10-30 15:28:48'),
-	(122,14,'GetFollowing','2014-10-30 15:28:48'),
-	(123,5,'GetIncomingFriends','2014-10-30 15:28:48'),
-	(124,9,'GetTweetList','2014-10-30 15:28:48'),
-	(125,16,'GetTweetList','2014-10-30 15:28:49'),
-	(126,443,'GetFollowers','2014-10-30 15:30:32'),
-	(127,451,'GetFollowing','2014-10-30 15:30:32'),
-	(128,461,'GetIncomingFriends','2014-10-30 15:30:32'),
-	(129,488,'GetTweetList','2014-10-30 15:30:32'),
-	(130,458,'GetOutgoingFriends','2014-10-30 15:30:32'),
-	(131,7,'GetIncomingFriends','2014-10-30 15:30:51'),
-	(132,53,'GetOutgoingFriends','2014-10-30 15:30:51'),
-	(133,10,'GetFollowers','2014-10-30 15:30:51'),
-	(134,9,'GetFollowing','2014-10-30 15:30:51'),
-	(135,12,'GetTweetList','2014-10-30 15:30:52');
+	(1,206,'UsernameLogin','2014-10-30 16:46:32','Andrews-MacBook-Pro.local'),
+	(2,185,'GetTweetList','2014-10-30 16:46:32','Andrews-MacBook-Pro.local'),
+	(3,11,'GetIncomingFriends','2014-10-30 16:46:36','Andrews-MacBook-Pro.local'),
+	(4,16,'GetFollowers','2014-10-30 16:46:36','Andrews-MacBook-Pro.local'),
+	(5,11,'GetOutgoingFriends','2014-10-30 16:46:36','Andrews-MacBook-Pro.local'),
+	(6,10,'GetFollowing','2014-10-30 16:46:36','Andrews-MacBook-Pro.local'),
+	(7,9,'GetIncomingFriends','2014-10-30 16:46:37','Andrews-MacBook-Pro.local'),
+	(8,11,'GetFollowing','2014-10-30 16:46:37','Andrews-MacBook-Pro.local'),
+	(9,10,'GetOutgoingFriends','2014-10-30 16:46:37','Andrews-MacBook-Pro.local'),
+	(10,11,'GetFollowers','2014-10-30 16:46:37','Andrews-MacBook-Pro.local'),
+	(11,21,'GetFollowing','2014-10-30 16:46:39','Andrews-MacBook-Pro.local'),
+	(12,9,'GetIncomingFriends','2014-10-30 16:46:39','Andrews-MacBook-Pro.local'),
+	(13,9,'GetOutgoingFriends','2014-10-30 16:46:39','Andrews-MacBook-Pro.local'),
+	(14,9,'GetFollowers','2014-10-30 16:46:39','Andrews-MacBook-Pro.local'),
+	(15,40,'GetTweetList','2014-10-30 16:46:40','Andrews-MacBook-Pro.local'),
+	(16,24,'GetTweetList','2014-10-30 16:46:40','Andrews-MacBook-Pro.local'),
+	(17,32,'GetTweetList','2014-10-30 16:46:41','Andrews-MacBook-Pro.local'),
+	(18,6,'PostTweet','2014-10-30 16:46:44','Andrews-MacBook-Pro.local'),
+	(19,30,'GetTweetList','2014-10-30 16:46:45','Andrews-MacBook-Pro.local');
 
 /*!40000 ALTER TABLE `Queue` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -318,7 +207,11 @@ VALUES
 	(119,15,'tweet ya'),
 	(120,15,'tweeeter'),
 	(121,15,'qwer'),
-	(122,15,'');
+	(122,15,''),
+	(123,15,'hey'),
+	(124,15,'ip'),
+	(125,15,'ip 2'),
+	(126,15,'tweet');
 
 /*!40000 ALTER TABLE `Tweet` ENABLE KEYS */;
 UNLOCK TABLES;

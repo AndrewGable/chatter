@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by andrew on 10/29/14.
+ * Created by andrew on 10/30/14.
  */
 @Entity
 public class Queue {
@@ -12,6 +12,7 @@ public class Queue {
     private long time;
     private String task;
     private Date date;
+    private String serverName;
 
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
@@ -45,13 +46,23 @@ public class Queue {
 
     @Basic
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "date", nullable = false, insertable = true, updatable = true)
+    @Column(name = "date", nullable = true, insertable = true, updatable = true)
     public Date getDate() {
         return date;
     }
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    @Basic
+    @Column(name = "server_name", nullable = true, insertable = true, updatable = true, length = 256)
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     @Override
@@ -61,9 +72,10 @@ public class Queue {
 
         Queue queue = (Queue) o;
 
-        if (date != queue.date) return false;
         if (id != queue.id) return false;
         if (time != queue.time) return false;
+        if (date != null ? !date.equals(queue.date) : queue.date != null) return false;
+        if (serverName != null ? !serverName.equals(queue.serverName) : queue.serverName != null) return false;
         if (task != null ? !task.equals(queue.task) : queue.task != null) return false;
 
         return true;
@@ -74,6 +86,8 @@ public class Queue {
         int result = id;
         result = 31 * result + (int) (time ^ (time >>> 32));
         result = 31 * result + (task != null ? task.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (serverName != null ? serverName.hashCode() : 0);
         return result;
     }
 }

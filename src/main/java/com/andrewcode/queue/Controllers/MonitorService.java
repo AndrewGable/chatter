@@ -17,6 +17,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -44,6 +46,14 @@ public class MonitorService {
 
         // Get all the queue data in a list
         List<Queue> times = session.createCriteria(Queue.class).list();
+
+        String ip = Utils.getServerName();
+
+        for (int i = 0; i < times.size(); i++) {
+            if(!times.get(i).getServerName().equals(ip)){
+                times.remove(i);
+            }
+        }
 
         // Sort the data based on time
         Collections.sort(times, new Comparator<Queue>() {
@@ -103,13 +113,18 @@ public class MonitorService {
         Session session = sessionFactory.openSession();
         Gson gson = new GsonBuilder().create();
 
+        String ip = Utils.getServerName();
+
         // Minute
         if (resolution.equals("minutes")) {
             long MIN_IN_MS = 1000 * 60 * 100;
             Date startDate = new Date(System.currentTimeMillis() - (MIN_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            return gson.toJson(criteria.list().size());
+            criteria.add(Restrictions.eq("serverName", ip));
+            String result = gson.toJson(criteria.list().size());
+            session.close();
+            return result;
         }
         // Hours
         else if (resolution.equals("hours")) {
@@ -117,7 +132,10 @@ public class MonitorService {
             Date startDate = new Date(System.currentTimeMillis() - (HOUR_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            return gson.toJson(criteria.list().size());
+            criteria.add(Restrictions.eq("serverName", ip));
+            String result = gson.toJson(criteria.list().size());
+            session.close();
+            return result;
         }
         // Days
         else if (resolution.equals("days")) {
@@ -125,7 +143,10 @@ public class MonitorService {
             Date startDate = new Date(System.currentTimeMillis() - (DAYS_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            return gson.toJson(criteria.list().size());
+            criteria.add(Restrictions.eq("serverName", ip));
+            String result = gson.toJson(criteria.list().size());
+            session.close();
+            return result;
         }
         // Months
         else if (resolution.equals("months")) {
@@ -133,7 +154,10 @@ public class MonitorService {
             Date startDate = new Date(System.currentTimeMillis() - (MONTHS_IN_MS));
             Criteria criteria = session.createCriteria(Queue.class)
                     .add(Restrictions.between("date", startDate, new Date()));
-            return gson.toJson(criteria.list().size());
+            criteria.add(Restrictions.eq("serverName", ip));
+            String result = gson.toJson(criteria.list().size());
+            session.close();
+            return result;
         }
         // Throw an exception
         else {
@@ -143,6 +167,7 @@ public class MonitorService {
             error.setErrorCode(400);
             error.setDate(new Date());
             error.setException("ResolutionException");
+            error.setServerName(Utils.getServerName());
             session.save(error);
             transaction.commit();
             session.close();
@@ -159,9 +184,14 @@ public class MonitorService {
         Session session = sessionFactory.openSession();
         Gson gson = new GsonBuilder().create();
 
-        List query = session.createQuery("from Errors WHERE errorCode= :errorCode ").setParameter("errorCode", type).list();
+        List query = session.createQuery("from Errors WHERE errorCode= :errorCode and serverName= :serverName")
+                .setParameter("errorCode", type).setParameter("serverName", Utils.getServerName()).list();
 
-        return gson.toJson(query.size());
+
+        String result = gson.toJson(query.size());
+        session.close();
+
+        return result;
     }
 
 

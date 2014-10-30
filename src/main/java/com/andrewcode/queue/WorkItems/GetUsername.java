@@ -47,6 +47,7 @@ public class GetUsername implements WorkItem {
             error.setErrorCode(400);
             error.setDate(new Date());
             error.setException("UserException");
+            error.setServerName(Utils.getServerName());
             session.save(error);
             transaction.commit();
             session.close();
@@ -60,6 +61,7 @@ public class GetUsername implements WorkItem {
         queue.setTask(this.getClass().getSimpleName());
         queue.setTime(System.currentTimeMillis() - startTime);
         queue.setDate(new Date());
+        queue.setServerName(Utils.getServerName());
         session.save(queue);
 
         transaction.commit();

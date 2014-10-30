@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Created by andrew on 10/29/14.
+ * Created by andrew on 10/30/14.
  */
 @Entity
 public class Errors {
@@ -12,6 +12,7 @@ public class Errors {
     private Integer errorCode;
     private Date date;
     private String exception;
+    private String serverName;
 
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
@@ -54,6 +55,16 @@ public class Errors {
         this.exception = exception;
     }
 
+    @Basic
+    @Column(name = "server_name", nullable = true, insertable = true, updatable = true, length = 256)
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,6 +76,7 @@ public class Errors {
         if (date != null ? !date.equals(errors.date) : errors.date != null) return false;
         if (errorCode != null ? !errorCode.equals(errors.errorCode) : errors.errorCode != null) return false;
         if (exception != null ? !exception.equals(errors.exception) : errors.exception != null) return false;
+        if (serverName != null ? !serverName.equals(errors.serverName) : errors.serverName != null) return false;
 
         return true;
     }
@@ -75,6 +87,7 @@ public class Errors {
         result = 31 * result + (errorCode != null ? errorCode.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (exception != null ? exception.hashCode() : 0);
+        result = 31 * result + (serverName != null ? serverName.hashCode() : 0);
         return result;
     }
 }

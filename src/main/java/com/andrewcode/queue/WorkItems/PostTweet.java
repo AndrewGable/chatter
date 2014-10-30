@@ -11,6 +11,9 @@ import com.google.gson.GsonBuilder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 /**
@@ -44,6 +47,7 @@ public class PostTweet implements WorkItem {
             error.setErrorCode(400);
             error.setDate(new Date());
             error.setException("TweetException");
+            error.setServerName(Utils.getServerName());
             session.save(error);
             transaction.commit();
             session.close();
@@ -61,6 +65,7 @@ public class PostTweet implements WorkItem {
         queue.setTask(this.getClass().getSimpleName());
         queue.setTime(System.currentTimeMillis() - startTime);
         queue.setDate(new Date());
+        queue.setServerName(Utils.getServerName());
         session.save(queue);
 
         transaction.commit();

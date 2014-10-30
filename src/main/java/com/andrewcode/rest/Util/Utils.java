@@ -5,8 +5,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by andrew on 9/20/14.
@@ -14,7 +17,7 @@ import javax.servlet.http.HttpSession;
  */
 public class Utils {
 
-    public static Long getUserId(HttpServletRequest req){
+    public static Long getUserId(HttpServletRequest req) {
         Long userId = null;
         try {
             if (req == null) {
@@ -31,6 +34,22 @@ public class Utils {
         }
 
         return userId;
+    }
+
+    public static String getServerName() {
+
+        // Get ip of current server
+        InetAddress ip = null;
+        try {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        if (ip != null) {
+            return ip.getHostName();
+        }
+        else
+            return "0";
     }
 
     public static SessionFactory createSessionFactory() {

@@ -55,6 +55,7 @@ public class GetIncomingFriends implements WorkItem {
         queue.setTask(this.getClass().getSimpleName());
         queue.setTime(System.currentTimeMillis() - startTime);
         queue.setDate(new Date());
+        queue.setServerName(Utils.getServerName());
         session.save(queue);
 
         transaction.commit();
