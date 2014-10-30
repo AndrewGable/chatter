@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chatter - Monitor</title>
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.modal.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link rel="stylesheet" href="/css/jquery.modal.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+    <body>
+
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <a href="/" class="pure-menu-heading">Chatter</a>
+
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/tweet.html">Tweet</a></li>
+                <li><a href="/friends.html">Friends</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li class="pure-menu-selected" ><a href="/monitor.html">Monitor</a></li>
+                <li><a class="logout">Logout</a></li>
+            </ul>
+        </div>
+
+        <div class="pure-g l-box">
+            <div class="pure-u-1 l-box">
+                <p class="lead">Server One</p>
+                <a class="pure-button button-success" href="http://cs597-andrew-one:8080/dashboard.html">Server One Dashboard</a>
+            </div>
+            <div class="pure-u-1 l-box">
+                <p class="lead">Server Two</p>
+                <a class="pure-button button-warning" href="http://cs597-andrew-two:8080/dashboard.html">Server Two Dashboard</a>
+            </div>
+            <div class="pure-u-1 l-box">
+                <p class="lead">Server Three</p>
+                <a class="pure-button button-secondary" href="http://cs597-andrew-three:8080/dashboard.html">Server Three Dashboard</a>
+            </div>
+        </div>
+
+    </body>
+</html>
