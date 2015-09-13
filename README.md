@@ -10,13 +10,13 @@ The project was broken up into three separate services: friend service, tweet se
 service. The friend service, and tweet service were additionally load balanced using a queuing system
 to respond to requests.
 
-<center><img src="http://andrewcode.com/img/chatterHome.png"></center>
+<p align="center"><img width="500" src="http://andrewcode.com/img/chatterHome.png"></p>
 
 The monitor service keeps stats on all different types of information about Chatter services running.
 It displayed them for each individual load balanced servers in a dashboard. The dashboard used the
 <a href="http://www.chartjs.org/">Chart.js</a> library to chart statistics in a responsive manner.
 
-<center><img src="http://andrewcode.com/img/chatterDashboard.png"></center>
+<p align="center"><img width="400" src="http://andrewcode.com/img/chatterDashboard.png"></p>
 
 Quick Access:
 
