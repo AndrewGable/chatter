@@ -1,6 +1,22 @@
-Andrew Gable - README 
-Cloud Computing CS 497 - Dr. Dialani
-Programming Assignment 2 - Chatter with a Monitor
+### Chatter
+The Chatter Web Project was developed in the Cloud Computing course at Boise State University.
+It was deployed on three separate Ubuntu 14.04 virtual machines, with one database virtual server, 
+and a load balancer server. The load balancer used <a href="http://www.haproxy.org/">HAProxy</a> to 
+keep sticky sessions between the load balanced servers. The project was deployed on Tomcat 8 with a
+Jersey servlet and a JAX-RS RESTful API. The back end used Hibernate with a MySQL database. The front
+end implemented <a href="http://purecss.io/">PureCSS</a> and JQuery.</p>
+
+The project was broken up into three separate services: friend service, tweet service, and monitor 
+service. The friend service, and tweet service were additionally load balanced using a queuing system
+to respond to requests.
+
+<center><img src="http://andrewcode.com/img/chatterHome.png"></center>
+
+The monitor service keeps stats on all different types of information about Chatter services running.
+It displayed them for each individual load balanced servers in a dashboard. The dashboard used the
+<a href="http://www.chartjs.org/">Chart.js</a> library to chart statistics in a responsive manner.
+
+<center><img src="http://andrewcode.com/img/chatterDashboard.png"></center>
 
 Quick Access:
 
