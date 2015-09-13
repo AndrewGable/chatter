@@ -190,8 +190,8 @@ This project was much more challenging then the previous project. I learned a lo
 
 ### Links:
 
-http://blog.haproxy.com/2012/03/29/load-balancing-affinity-persistence-sticky-sessions-what-you-need-to-know/
-https://serversforhackers.com/editions/2014/07/15/haproxy/
-http://www.chartjs.org/
-http://purecss.io/
-http://www.rackspace.com/knowledge_center/article/mysql-connect-to-your-database-remotely
+- http://blog.haproxy.com/2012/03/29/load-balancing-affinity-persistence-sticky-sessions-what-you-need-to-know/
+- https://serversforhackers.com/editions/2014/07/15/haproxy/
+- http://www.chartjs.org/
+- http://purecss.io/
+- http://www.rackspace.com/knowledge_center/article/mysql-connect-to-your-database-remotely
